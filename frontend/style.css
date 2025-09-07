@@ -245,6 +245,51 @@ header h1 {
     color: var(--text-secondary);
 }
 
+/* Clickable lesson links in sources */
+.lesson-link {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--primary-color), #3b82f6);
+    color: white;
+    text-decoration: none;
+    padding: 0.375rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin: 0.125rem 0.25rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
+    position: relative;
+}
+
+.lesson-link:hover {
+    background: linear-gradient(135deg, #1d4ed8, #2563eb);
+    transform: translateY(-1px) scale(1.02);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+    border-color: rgba(59, 130, 246, 0.6);
+    color: white;
+    text-decoration: none;
+}
+
+.lesson-link:visited {
+    background: linear-gradient(135deg, var(--primary-color), #3b82f6);
+    color: white;
+}
+
+.lesson-link:active {
+    transform: translateY(0) scale(0.98);
+    transition: all 0.1s ease;
+}
+
+/* Add external link icon */
+.lesson-link::after {
+    content: ' ↗';
+    font-size: 0.7rem;
+    opacity: 0.8;
+    margin-left: 0.25rem;
+}
+
 /* Markdown formatting styles */
 .message-content h1,
 .message-content h2,
@@ -599,6 +644,40 @@ details[open] .suggested-header::before {
     color: var(--text-secondary);
     font-style: italic;
     text-transform: none;
+}
+
+/* New Chat Button */
+.new-chat-button {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 0.5rem 0;
+    border: none;
+    background: none;
+    list-style: none;
+    outline: none;
+    transition: color 0.2s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    text-align: left;
+    width: 100%;
+}
+
+.new-chat-button:focus {
+    color: var(--primary-color);
+}
+
+.new-chat-button:hover {
+    color: var(--primary-color);
+}
+
+.new-chat-button::before {
+    content: '▶';
+    display: inline-block;
+    margin-right: 0.5rem;
+    transition: transform 0.2s ease;
+    font-size: 0.75rem;
 }
 
 /* Suggested Questions in Sidebar */

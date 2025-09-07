@@ -100,10 +100,15 @@ class CourseSearchTool(Tool):
                 header += f" - Lesson {lesson_num}"
             header += "]"
             
-            # Track source for the UI
+            # Track source for the UI with embedded link
             source = course_title
             if lesson_num is not None:
                 source += f" - Lesson {lesson_num}"
+                # Get lesson link and embed it invisibly
+                lesson_link = self.store.get_lesson_link(course_title, lesson_num)
+                if lesson_link:
+                    # Embed link invisibly using HTML data attribute
+                    source = f'<span data-lesson-link="{lesson_link}">{source}</span>'
             sources.append(source)
             
             formatted.append(f"{header}\n{doc}")
@@ -112,6 +117,73 @@ class CourseSearchTool(Tool):
         self.last_sources = sources
         
         return "\n\n".join(formatted)
+
+class CourseOutlineTool(Tool):
+    """Tool for retrieving course outline information"""
+    
+    def __init__(self, vector_store: VectorStore):
+        self.store = vector_store
+    
+    def get_tool_definition(self) -> Dict[str, Any]:
+        """Return Anthropic tool definition for this tool"""
+        return {
+            "name": "get_course_outline",
+            "description": "Get course outline with title, link, and complete lesson list for a specific course",
+            "input_schema": {
+                "type": "object",
+                "properties": {
+                    "course_name": {
+                        "type": "string",
+                        "description": "Course title (partial matches work, e.g. 'MCP', 'Introduction')"
+                    }
+                },
+                "required": ["course_name"]
+            }
+        }
+    
+    def execute(self, course_name: str) -> str:
+        """
+        Execute the outline tool to get course information.
+        
+        Args:
+            course_name: Course title to find outline for
+            
+        Returns:
+            Formatted course outline or error message
+        """
+        # Use vector store's course resolution method
+        course_data = self.store.get_course_by_name(course_name)
+        
+        if not course_data:
+            return f"No course found matching '{course_name}'. Please check the course name and try again."
+        
+        # Format the course outline
+        return self._format_outline(course_data)
+    
+    def _format_outline(self, course_data: Dict[str, Any]) -> str:
+        """Format course data into outline format"""
+        title = course_data.get('title', 'Unknown Course')
+        instructor = course_data.get('instructor', 'Unknown Instructor')
+        course_link = course_data.get('course_link', 'No link available')
+        lessons = course_data.get('lessons', [])
+        
+        # Build formatted outline
+        outline = [f"**{title}**"]
+        outline.append(f"Instructor: {instructor}")
+        outline.append(f"Course Link: {course_link}")
+        outline.append("")
+        outline.append("**Course Lessons:**")
+        
+        if lessons:
+            for lesson in lessons:
+                lesson_num = lesson.get('lesson_number', '?')
+                lesson_title = lesson.get('lesson_title', 'Untitled Lesson')
+                outline.append(f"{lesson_num}. {lesson_title}")
+        else:
+            outline.append("No lessons available")
+        
+        return "\n".join(outline)
+
 
 class ToolManager:
     """Manages available tools for the AI"""
